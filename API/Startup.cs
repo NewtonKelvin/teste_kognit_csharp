@@ -1,7 +1,11 @@
+using API.Data;
+using API.Repositories;
+using API.Repositories.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -27,11 +31,20 @@ namespace API
         public void ConfigureServices(IServiceCollection services)
         {
 
+
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
             });
+
+            services.AddControllers().AddNewtonsoftJson();
+            services.AddEntityFrameworkSqlServer()
+                .AddDbContext<DBContext>(
+                    options => options.UseSqlServer(Configuration.GetConnectionString("Database"))
+                );
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IWalletRepository, WalletRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
